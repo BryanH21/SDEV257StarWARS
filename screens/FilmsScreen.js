@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Button, Modal, Text, TextInput, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Button, Modal, Text, TextInput, View } from "react-native";
 import { SwipeListView } from "react-native-swipe-list-view";
 
 export default function FilmsScreen() {
@@ -9,10 +9,19 @@ export default function FilmsScreen() {
   const [swipeItem, setSwipeItem] = useState("");
   const [swipeModalVisible, setSwipeModalVisible] = useState(false);
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     fetch("https://swapi.info/api/films")
       .then((response) => response.json())
-      .then((data) => setFilms(data));
+      .then((data) => {
+        setFilms(data);
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }).start();
+      });
   }, []);
 
   return (
@@ -79,38 +88,40 @@ export default function FilmsScreen() {
         </View>
       </Modal>
 
-      <SwipeListView
-        data={films}
-        keyExtractor={(item) => item.title}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 10,
-              borderBottomWidth: 1,
-            }}
-          >
-            <Text style={{ fontSize: 16 }}>{item.title}</Text>
-          </View>
-        )}
-        renderHiddenItem={({ item }) => (
-          <View
-            style={{
-              backgroundColor: "#55BCF6",
-              flex: 1,
-              justifyContent: "center",
-              paddingLeft: 15,
-            }}
-          >
-            <Text style={{ color: "white" }}>{item.title}</Text>
-          </View>
-        )}
-        leftOpenValue={75}
-        onRowOpen={(rowKey, rowMap) => {
-          setSwipeItem(rowKey);
-          setSwipeModalVisible(true);
-        }}
-      />
+      <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+        <SwipeListView
+          data={films}
+          keyExtractor={(item) => item.title}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 10,
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text style={{ fontSize: 16 }}>{item.title}</Text>
+            </View>
+          )}
+          renderHiddenItem={({ item }) => (
+            <View
+              style={{
+                backgroundColor: "#55BCF6",
+                flex: 1,
+                justifyContent: "center",
+                paddingLeft: 15,
+              }}
+            >
+              <Text style={{ color: "white" }}>{item.title}</Text>
+            </View>
+          )}
+          leftOpenValue={75}
+          onRowOpen={(rowKey, rowMap) => {
+            setSwipeItem(rowKey);
+            setSwipeModalVisible(true);
+          }}
+        />
+      </Animated.View>
     </View>
   );
 }

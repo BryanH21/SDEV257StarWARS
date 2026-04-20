@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Button, Modal, Text, TextInput, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Button, Modal, Text, TextInput, View } from "react-native";
 import { SwipeListView } from "react-native-swipe-list-view";
 
 export default function SpaceshipsScreen() {
@@ -9,10 +9,19 @@ export default function SpaceshipsScreen() {
   const [swipeItem, setSwipeItem] = useState("");
   const [swipeModalVisible, setSwipeModalVisible] = useState(false);
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     fetch("https://swapi.info/api/starships")
       .then((response) => response.json())
-      .then((data) => setSpaceships(data));
+      .then((data) => {
+        setSpaceships(data);
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }).start();
+      });
   }, []);
 
   return (
@@ -79,38 +88,40 @@ export default function SpaceshipsScreen() {
         </View>
       </Modal>
 
-      <SwipeListView
-        data={spaceships}
-        keyExtractor={(item) => item.name}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 10,
-              borderBottomWidth: 1,
-            }}
-          >
-            <Text style={{ fontSize: 16 }}>{item.name}</Text>
-          </View>
-        )}
-        renderHiddenItem={({ item }) => (
-          <View
-            style={{
-              backgroundColor: "#55BCF6",
-              flex: 1,
-              justifyContent: "center",
-              paddingLeft: 15,
-            }}
-          >
-            <Text style={{ color: "white" }}>{item.name}</Text>
-          </View>
-        )}
-        leftOpenValue={75}
-        onRowOpen={(rowKey, rowMap) => {
-          setSwipeItem(rowKey);
-          setSwipeModalVisible(true);
-        }}
-      />
+      <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+        <SwipeListView
+          data={spaceships}
+          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 10,
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text style={{ fontSize: 16 }}>{item.name}</Text>
+            </View>
+          )}
+          renderHiddenItem={({ item }) => (
+            <View
+              style={{
+                backgroundColor: "#55BCF6",
+                flex: 1,
+                justifyContent: "center",
+                paddingLeft: 15,
+              }}
+            >
+              <Text style={{ color: "white" }}>{item.name}</Text>
+            </View>
+          )}
+          leftOpenValue={75}
+          onRowOpen={(rowKey, rowMap) => {
+            setSwipeItem(rowKey);
+            setSwipeModalVisible(true);
+          }}
+        />
+      </Animated.View>
     </View>
   );
 }
