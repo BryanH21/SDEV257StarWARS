@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Button, Modal, Text, TextInput, View } from "react-native";
+import {
+  Animated,
+  Button,
+  Image,
+  Modal,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SwipeListView } from "react-native-swipe-list-view";
 
 export default function PlanetsScreen() {
@@ -26,6 +34,18 @@ export default function PlanetsScreen() {
 
   return (
     <View style={{ flex: 1, padding: 20, paddingTop: 60 }}>
+      <Image
+        source={require("../assets/images/Planet.jpg")}
+        style={{
+          width: "100%",
+          height: 150,
+          borderRadius: 10,
+          marginBottom: 10,
+        }}
+        resizeMode="cover"
+        loadingIndicatorSource={{ uri: "" }}
+      />
+
       <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}>
         Planets
       </Text>
